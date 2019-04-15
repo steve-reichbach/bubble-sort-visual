@@ -77,14 +77,17 @@ class App extends React.Component {
                                 array: inputString
                                     .replace(/[\[\]]/g, '')
                                     .split(',')
-                                    .map(v => +v)
+                                    .map(v => v.trim() === '' ? 'void' : +v)
+                                    .filter(i => !['void', NaN].includes(i))
                             })
                         }}
                     />
                 </div>
-                <p>What basically the algorithm does is comparing two elements of the array and apply action
+                <p>
+                    What basically the algorithm does is comparing two elements of the array and apply action
                     in case if A is bigger than B, then it swaps them and go further till it reaches the end of
-                    the array and then the process repeats.</p>
+                    the array and then the process repeats.
+                </p>
                 {
                     (process !== START && array.length) ? array.map((item, n) => {
                         const indexA = i;
