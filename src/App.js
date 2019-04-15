@@ -1,14 +1,23 @@
 import React from 'react';
 import TextField from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
-import {INITIAL_STATE, START, CALCULATING, FINISHED} from './constants';
+import {
+    INITIAL_STATE,
+    CALCULATING,
+    FINISHED,
+
+    INPUT_ARRAY_ID,
+    INTERVAL,
+
+    getDataInput,
+    clearDataInput
+} from './constants';
 
 class App extends React.Component {
     state = { ...INITIAL_STATE };
     init = () => {
-        this.swap();
-        const intervalId = setInterval(this.swap, 2000);
-        // store intervalId in the state so it can be accessed later:
+        const intervalId = setInterval(this.swap, INTERVAL);
+        // Store intervalId in the state so it can be accessed later:
         this.setState({
             intervalId: intervalId,
             process: CALCULATING
@@ -16,7 +25,6 @@ class App extends React.Component {
     };
 
     swap = () => {
-        // setState method is used to update the state
         let { i, swapped } = this.state;
         const array = [...this.state.array];
 
@@ -51,20 +59,23 @@ class App extends React.Component {
             let array = this.state.array;
             finalState = { ...INITIAL_STATE, process, array };
         } else {
-            finalState = { ...INITIAL_STATE }
+            finalState = { ...INITIAL_STATE };
         }
+        clearDataInput();
         this.setState(finalState);
     };
 
     render() {
-        const { intervalId, a, b, i, array, process, inputString } = this.state;
+        const { a, b, i, array, process, inputString, intervalId } = this.state;
+        const toShowDuringCalculation = process === CALCULATING && (a || a === 0) && (b || b === 0);
+
         return (
             <section>
                 <h1>Bubble sort visualizer</h1>
                 <p>Please fill in elements to be sorted using comma as a separator</p>
                 <div className="input">
                     <TextField
-                        id='InputArray'
+                        id={INPUT_ARRAY_ID}
                         required
                         disabled={!!intervalId}
                         error ={!(/[,\d+]/g.test(inputString)) }
@@ -74,11 +85,7 @@ class App extends React.Component {
                             const inputString = e.target.value;
                             this.setState({
                                 inputString: inputString,
-                                array: inputString
-                                    .replace(/[\[\]]/g, '')
-                                    .split(',')
-                                    .map(v => v.trim() === '' ? 'void' : +v)
-                                    .filter(i => !['void', NaN].includes(i))
+                                array: getDataInput(inputString)
                             })
                         }}
                     />
@@ -89,40 +96,42 @@ class App extends React.Component {
                     the array and then the process repeats.
                 </p>
                 {
-                    (process !== START && array.length) ? array.map((item, n) => {
+                    toShowDuringCalculation ? array.map((item, n) => {
                         const indexA = i;
                         const indexB = i - 1;
 
                         return <div className={
-                            'arrayElement ' + (n === indexA ? ' A' : (n === indexB ? ' B' : '')) +
+                            'arrayElement ' + (n === indexA || n === indexB ? ' moving' : '') +
                             ((n === indexA && item > b) ? ' arrowRight' : '') +
                             ((n === indexB && item < a) ? ' arrowLeft' : '')
                         } key={`${item} – ${n}`}>{item}</div>
                     }) : null
                 }
                 {
-                    process === CALCULATING ?
+                    toShowDuringCalculation ?
                         (<h2>
                             So, is
-                            <span className={ 'operandA ' }>{ a || a === 0 ? ` ${a}` : '' } </span> >
-                            <span className='operandB'>{ b || b === 0 ? ` ${b}` : '' } </span> ?
+                            <span className='operand'> {a}</span> >
+                            <span className='operand'> {b}</span> ?
                         </h2>)
-                        :null
+                        : null
                 }
                 {
-                    process === CALCULATING ?
+                    toShowDuringCalculation ?
                         a > b ?
                             (<h2><span style={{color: 'lightgreen'}}>Yes</span>, that's why current action is: {b} goes left and {a} goes right</h2>) :
                             (<h2><span style={{color: 'lightgray'}}>Nope</span>, so we are doing nothing <span role="img" aria-label="clock image">🕒</span></h2>)
                         : null
                 }
-                <h2>{ process === FINISHED ? `The answer is: ${JSON.stringify(array) }` : ''}</h2>
+                {
+                    process === FINISHED ? <h2>The result is: {JSON.stringify(array)}</h2> : null
+                }
                 <br/>
                 <Button
                     color="primary"
-                    disabled={this.state.array.length < 2 || this.state.process !== START}
+                    disabled={array.length < 2 || process === CALCULATING || process === FINISHED}
                     onClick={ () => this.init() }>
-                    Visualize!
+                    Start
                 </Button>
                 <Button color="primary" onClick={ () => this.stopLoop() }>
                     Reset

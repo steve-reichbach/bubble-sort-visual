@@ -25,6 +25,12 @@ code {
   position: relative;
 }
 
+.arrayElement.moving
+{
+  border-style: dashed;
+  border-color: darkslateblue;
+}
+
 .arrayElement.arrowRight:after,
 .arrayElement.arrowLeft:after
 {
@@ -43,29 +49,8 @@ code {
   content: '←';
 }
 
-.A,
-.B
+.operand
 {
-  border-style: dashed;
-}
-
-.A
-{
-  border-color: red;
-}
-
-.B
-{
-  border-color: gray;
-}
-
-.operandA
-{
-  color: red;
+  color: green;
   position: relative;
-}
-
-.operandB
-{
-  color: gray;
 }
