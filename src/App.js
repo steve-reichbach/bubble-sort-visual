@@ -57,14 +57,13 @@ class App extends React.Component {
     };
 
     render() {
-        const { intervalId, a, b, array, process, inputString } = this.state;
+        const { intervalId, a, b, i, array, process, inputString } = this.state;
         return (
             <section>
                 <h1>Bubble sort visualizer</h1>
-                <p>Please fill in element to be sorted using comma as a separator</p>
+                <p>Please fill in elements to be sorted using comma as a separator</p>
                 <div className="input">
                     <TextField
-                        label='Type in array values using comma as its separator here:'
                         id='InputArray'
                         required
                         disabled={!!intervalId}
@@ -87,13 +86,16 @@ class App extends React.Component {
                     in case if A is bigger than B, then it swaps them and go further till it reaches the end of
                     the array and then the process repeats.</p>
                 {
-                    (process !== START && array.length) ? array.map((item, index) => (
-                        <div className={
-                            'arrayElement ' + (item === a ? ' A' : (item === b ? ' B' : '')) +
-                            ((item === a && item > b) ? ' arrowRight' : '') +
-                            ((item === b && item < a) ? ' arrowLeft' : '')
-                        } key={`${item} – ${index}`}>{ item }</div>
-                    )) : null
+                    (process !== START && array.length) ? array.map((item, n) => {
+                        const indexA = i;
+                        const indexB = i - 1;
+
+                        return <div className={
+                            'arrayElement ' + (n === indexA ? ' A' : (n === indexB ? ' B' : '')) +
+                            ((n === indexA && item > b) ? ' arrowRight' : '') +
+                            ((n === indexB && item < a) ? ' arrowLeft' : '')
+                        } key={`${item} – ${n}`}>{item}</div>
+                    }) : null
                 }
                 {
                     process === CALCULATING ?
@@ -107,15 +109,15 @@ class App extends React.Component {
                 {
                     process === CALCULATING ?
                         a > b ?
-                            (<h2>Yes, that's why current action is: {b} goes left and {a} goes right</h2>) :
-                            (<h2>Nope, so we are doing nothing 🕒</h2>)
+                            (<h2><span style={{color: 'lightgreen'}}>Yes</span>, that's why current action is: {b} goes left and {a} goes right</h2>) :
+                            (<h2><span style={{color: 'lightgray'}}>Nope</span>, so we are doing nothing <span role="img" aria-label="clock image">🕒</span></h2>)
                         : null
                 }
                 <h2>{ process === FINISHED ? `The answer is: ${JSON.stringify(array) }` : ''}</h2>
                 <br/>
                 <Button
                     color="primary"
-                    disabled={this.state.array.length < 2 && this.state.process !== START}
+                    disabled={this.state.array.length < 2 || this.state.process !== START}
                     onClick={ () => this.init() }>
                     Visualize!
                 </Button>

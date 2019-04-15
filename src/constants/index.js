@@ -1,7 +1,7 @@
 export const INITIAL_STATE = {
     array: [],
     swapped: false,
-    i: 0,
+    i: null,
     a: null,
     b: null,
     process: 'start',
