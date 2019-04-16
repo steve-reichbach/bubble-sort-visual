@@ -5,4 +5,6 @@ The following technologies are being used in the demo:
 3. Visualizer implemented [using setInterval](https://stackoverflow.com/questions/36299174/setinterval-in-a-react-app)
 due to React nature of updating state (and rerender) asynchronously which does not fit "for loop"
 
- 
+## How to run
+0. `yarn`
+1. `yarn run`
