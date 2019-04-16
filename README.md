@@ -8,3 +8,4 @@ due to React nature of updating state (and rerender) asynchronously which does n
 ## How to run
 0. `yarn`
 1. `yarn run`
+2. That's it
