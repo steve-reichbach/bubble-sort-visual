@@ -16,7 +16,7 @@ code {
 .arrayElement
 {
   display: inline-block;
-  border: 5px solid transparent;
+  border: 1px solid transparent;
   margin: 5px;
   padding: 3px 5px;
   font-style: normal;
@@ -28,7 +28,6 @@ code {
 .arrayElement.moving
 {
   border-style: dashed;
-  border-color: darkslateblue;
 }
 
 .arrayElement.arrowRight:after,
@@ -38,10 +37,6 @@ code {
   position: absolute;
   top: -100%;
   left: 0;
-}
-.arrayElement.arrowRight:after
-{
-  content: '→';
 }
 
 .arrayElement.arrowLeft:after
@@ -53,12 +48,20 @@ code {
 .A
 {
   color: red;
+  font-weight: 800;
+  border-top-color: black;
+  border-right-color: black;
+  border-bottom-color: black;
 }
 
 .arrayElement.arrowLeft,
 .B
 {
   color: blue;
+  font-weight: 800;
+  border-top-color: black;
+  border-left-color: black;
+  border-bottom-color: black;
 }
 
 .operand

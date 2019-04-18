@@ -3,7 +3,6 @@ import TextField from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
 import {
     INITIAL_STATE,
-    START,
     CALCULATING,
     PAUSED,
     FINISHED,
@@ -51,8 +50,6 @@ class App extends React.Component {
             this.setState({ process: CALCULATING });
         }
 
-        // const array = [...this.state.array];
-
         if (array.length < 2) {
             this.stop(true);
         }
@@ -64,19 +61,15 @@ class App extends React.Component {
             } else return this.stop(true);
         }
 
-        if (counter === 0) {
-            // FIXME: problem with counter === 0
-        }
         if (array[i + 1] < array[i]) {
             const temp = array[i];
             array[i] = array[i + 1];
             array[i + 1] = temp;
             swapped = true;
-            console.log(">>")
         }
 
-        a = array[i];
-        b = array[i + 1];
+        a = array[i + 1];
+        b = array[i];
         i += 1;
         counter += 1;
         this.setState({ a, b, i, swapped, array, counter });
@@ -85,55 +78,43 @@ class App extends React.Component {
     backward = (firedByUser) => {
         if (firedByUser) {
             this.pause();
-
             if (this.state.counter === 0) {
-                this.stop(true)
+                return;
             }
         }
-        let { i, swapped } = this.state;
-        const array = [...this.state.array];
+
+        let {
+            i,
+            swapped,
+            a,
+            b,
+            counter,
+            array
+        } = this.state;
 
         if (array.length < 2) {
             this.stop(true);
         }
 
-        if (this.state.process !== CALCULATING) {
-            this.setState({
-                process: CALCULATING
-            });
-        }
-
-        if (i === -1) {
+        if (i === 0) {
             i = array.length - 1;
-            // if (swapped === true) {
-            //     swapped = false;
-            // } else return this.stop(true);
+            if (swapped === true) {
+                swapped = false;
+            }
         }
 
-        let a = array[i];
-        let b = array[i + 1];
-        this.setState({ a, b });
-
-        if (array[i] < array[i + 1]) {
-            /*
+        if (array[i] > array[i - 1]) {
             const temp = array[i];
-            array[i - 1] = array[i];
-            array[i] = temp;
+            array[i] = array[i - 1];
+            array[i - 1] = temp;
             swapped = true;
-
-            a = array[i - 1];
-            b = array[i];
-            */
-            const temp = array[i];
-            array[i] = array[i + 1];
-            array[i + 1] = temp;
-            swapped = true;
-
-            a = array[i];
-            b = array[i + 1];
         }
+
+        a = array[i];
+        b = array[i - 1];
         i -= 1;
-        setTimeout(this.setState.bind(this, { a, b, i, swapped, array }), INTERVAL / 2);
+        counter -= 1;
+        this.setState({ a, b, i, swapped, array, counter });
     };
 
     stop = (finished) => {
@@ -153,7 +134,7 @@ class App extends React.Component {
     pause = () => this.state.intervalId ? clearInterval(this.state.intervalId) : null;
 
     render() {
-        const { a, b, i, array, process, inputString, intervalId, counter } = this.state;
+        const { a, b, array, process, inputString, intervalId, counter } = this.state;
         const toShowDuringCalculation = process === CALCULATING;
 
         return (
@@ -168,12 +149,16 @@ class App extends React.Component {
                         error ={!(/["',\d+]/g.test(inputString)) }
                         margin="none"
                         variant="outlined"
-                        value="90,21,-5"
                         onChange={ (e) => {
                             const inputString = e.target.value;
+                            const data = getDataInput(inputString);
                             this.setState({
                                 inputString: inputString,
-                                array: getDataInput(inputString)
+                                array: data,
+                                a: data[0],
+                                b: data[1],
+                                i: 0,
+                                swapped: false
                             })
                         }}
                     />
@@ -224,30 +209,24 @@ class App extends React.Component {
                 <br/>
                 {
                     array.length ? array.map((item, n) => {
-                        const indexA = i;
-                        const indexB = i - 1;
-
                         return <div className={
-                            'arrayElement ' + (n === indexA || n === indexB ? ' moving' : '') +
-                            (item === a ? ' A ' : (item === b ? ' B ' : '')) +
-                            ((n === indexA && item > b) ? ' arrowRight' : '') +
-                            ((n === indexB && item < a) ? ' arrowLeft' : '')
+                            'arrayElement ' +
+                            (counter > 0 && (item === a ? ' A ' : (item === b ? ' B ' : '')))
                         } key={`${item} – ${n}`}>{item}</div>
                     }) : null
                 }
                 {
                     toShowDuringCalculation ?
                         (<h2>
-                            So, is
-                            <span className='operand A'>{a}</span> > <span className='operand B'>{b}</span> ?
+                            Was <span className='operand A'>{a}</span> > <span className='operand B'>{b}</span> ?
                         </h2>)
                         : null
                 }
                 {
                     toShowDuringCalculation ?
                         a > b ?
-                            (<h2><span style={{color: 'lightgreen'}}>Yes</span>, that's why current action is: {b} goes left and {a} goes right</h2>) :
-                            (<h2><span style={{color: 'lightgray'}}>Nope</span>, so we are doing nothing <span role="img" aria-label="clock image">🕒</span></h2>)
+                            (<h2><span style={{color: 'lightgreen'}}>Yes</span>, that's why {b} went left and {a} – right</h2>) :
+                            (<h2><span style={{color: 'lightgray'}}>Nope</span>, so we didn't do anything <span role="img" aria-label="clock image">🕒</span></h2>)
                         : null
                 }
                 { process === FINISHED ? <h2>The result is: {JSON.stringify(array)}</h2> : null }
