@@ -49,8 +49,19 @@ code {
   content: '←';
 }
 
+.arrayElement.arrowRight,
+.A
+{
+  color: red;
+}
+
+.arrayElement.arrowLeft,
+.B
+{
+  color: blue;
+}
+
 .operand
 {
-  color: green;
   position: relative;
 }
